@@ -163,6 +163,7 @@ UN0KsG9JPRVNeQR8HnwpAkACrr9cNp1H1bytHG9a6L+5cVHkRhqqEYWVO41MhgZF
 ```
 Replace the value with content generated in dashboard. Create an app-mini.py file, fill it by the content below:
 > app-mini.py
+
 ```python
 from mixin_ws_api import MIXIN_WS_API
 from mixin_api import MIXIN_API
