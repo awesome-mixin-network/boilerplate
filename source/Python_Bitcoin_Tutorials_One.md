@@ -25,7 +25,7 @@ sudo apt install software-properties-common
 sudo add-apt-repository ppa:deadsnakes/ppa
 ```
 
-When prompt like below, press Enter to continue:
+press Enter to continue when console output
 ```bash
 Press [ENTER] to continue or Ctrl-c to cancel adding it.
 ```
