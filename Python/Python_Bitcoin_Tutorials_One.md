@@ -134,6 +134,7 @@ and write down required content, these content will be written into mixin_config
 ![mixin_network-keys](https://github.com/wenewzhang/mixin_labs-php-bot/blob/master/mixin_network-keys.jpg)
 In the folder, create a file: mixin_config.py. Copy the following content into it.
 > mixin_config.py
+
 ```python
 client_id= 'ed882a39-0b0c-4413-bbd9-221cdeee56bf'
 client_secret = '8d7ec7b9c8261b6c7bd6309210496ca4b72bce9efc7e49be14a428ce49ff7202'
