@@ -1,4 +1,4 @@
-# Python Bitcoin tutorial based on Mixin SDK I: Create bot
+# Python Bitcoin tutorial based on Mixin Network
 ![cover](https://github.com/wenewzhang/mixin_labs-python-bot/raw/master/Bitcoin_python.jpg)
 A Mixin messenger bot will be created in this tutorial. The bot is powered by python, it echo message and Bitcoin from user.
 
@@ -25,7 +25,7 @@ sudo apt install software-properties-common
 sudo add-apt-repository ppa:deadsnakes/ppa
 ```
 
-press Enter to continue when console output
+When prompt like below, press Enter to continue:
 ```bash
 Press [ENTER] to continue or Ctrl-c to cancel adding it.
 ```
@@ -131,10 +131,9 @@ You need to create an app in dashboard. This [tutorial](https://mixin-network.gi
 After app is created in dashboard, you still need to [generate parameter](https://mixin-network.gitbook.io/mixin-network/mixin-messenger-app/create-bot-account#generate-secure-parameter-for-your-app)
 and write down required content, these content will be written into mixin_config.py file.
 
-![mixin_network-keys](https://github.com/wenewzhang/mixin_labs-php-bot/blob/master/mixin_network-keys.jpg)
+![mixin_network-keys](https://github.com/wenewzhang/mixin_labs-php-bot/raw/master/mixin_network-keys.jpg)
 In the folder, create a file: mixin_config.py. Copy the following content into it.
 > mixin_config.py
-
 ```python
 client_id= 'ed882a39-0b0c-4413-bbd9-221cdeee56bf'
 client_secret = '8d7ec7b9c8261b6c7bd6309210496ca4b72bce9efc7e49be14a428ce49ff7202'
@@ -163,7 +162,6 @@ UN0KsG9JPRVNeQR8HnwpAkACrr9cNp1H1bytHG9a6L+5cVHkRhqqEYWVO41MhgZF
 ```
 Replace the value with content generated in dashboard. Create an app-mini.py file, fill it by the content below:
 > app-mini.py
-
 ```python
 from mixin_ws_api import MIXIN_WS_API
 from mixin_api import MIXIN_API
@@ -250,7 +248,7 @@ ws open
 
 Add the bot(for example, this bot id is 7000101639) as your friend in [Mixin Messenger](https://mixin.one/messenger) and send your messages.
 
-![mixin_messenger](https://github.com/wenewzhang/mixin_labs-php-bot/blob/master/helloworld.jpeg)
+![mixin_messenger](https://github.com/wenewzhang/mixin_labs-php-bot/raw/master/helloworld.jpeg)
 
 ### Source code explanation
 The code creates a websocket client.
