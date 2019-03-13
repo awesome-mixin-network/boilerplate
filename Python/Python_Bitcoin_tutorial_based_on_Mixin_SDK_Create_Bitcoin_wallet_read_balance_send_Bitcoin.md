@@ -1,4 +1,4 @@
-# Python Bitcoin tutorial based on Mixin SDK III: Create Bitcoin wallet, read balance and send Bitcoin
+# Python Bitcoin tutorial based on Mixin Network: Create a Bitcoin wallet
 ![cover](https://github.com/wenewzhang/mixin_labs-python-bot/raw/master/Bitcoin_python.jpg)
 We have created a bot to [echo message](https://github.com/wenewzhang/mixin_labs-python-bot/blob/master/README.md) and [echo Bitcoin](https://github.com/wenewzhang/mixin_labs-python-bot/blob/master/README2.md).
 
@@ -8,7 +8,7 @@ We have created a bot to [echo message](https://github.com/wenewzhang/mixin_labs
 3. How to send Bitcoin with zero transaction fee and confirmed in 1 second
 4. How to send Bitcoin to other wallet
 
-## Create a Bitcoin wallet by Mixin Network Python SDK
+
 Pre-request: You should have a Mixin Network account. Create an account can be done by one line code:
 
 ```python
