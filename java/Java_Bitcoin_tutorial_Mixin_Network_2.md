@@ -44,7 +44,7 @@ LIST_PENDING_MESSAGES
 > :run
 ```
 Developer can send Bitcoin to their bots in chatting page. The bot will send Bitcoin back immediately after receive it.
-![transfer and tokens](https://github.com/wenewzhang/mixin_network-nodejs-bot2/blob/master/transfer-any-tokens.jpg)
+![transfer and tokens](https://github.com/wenewzhang/mixin_network-nodejs-bot2/raw/master/transfer-any-tokens.jpg)
 
 User can pay 0.001 Bitcoin to bot by click the button and the 0.001 Bitcoin will be refunded in 1 second. In fact, user can pay any coin.
 ![pay-link](https://github.com/wenewzhang/mixin_network-nodejs-bot2/blob/master/Pay_and_refund_quickly.jpg)
@@ -123,4 +123,4 @@ else if (msgP.toLowerCase().equals("appsgroup")) {
   MixinBot.send(webSocket, MIXIN_Action.CREATE_MESSAGE, msgParams.toString());
 }
 ```
-![pay-link](https://github.com/wenewzhang/mixin_labs-java-bot/blob/master/appcard.jpeg)
+![pay-link](https://github.com/wenewzhang/mixin_labs-java-bot/raw/master/appcard.jpeg)
