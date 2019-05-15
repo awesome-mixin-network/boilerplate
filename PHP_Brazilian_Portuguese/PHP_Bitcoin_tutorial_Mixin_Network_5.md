@@ -1,182 +1,231 @@
 
-# Como negociar bitcoin através da linguagem PHP
+# Como negociar bitcoin através de PHP
 ![](https://github.com/wenewzhang/mixin_labs-php-bot/raw/master/Bitcoin_php.jpg)
 
-## Solução um: pague para a API ExinCore
-[Exincore](https://github.com/exinone/exincore) fornece uma API de negociação comercial na Mixin Network.
+Exincore foi introduzido no [último capítulo](https://github.com/wenewzhang/mixin_labs-php-bot/blob/master/README4.md), você pode trocar muitos cripto ativos a preço de mercado e receber seu ativo em 1 segundo. Se você quer negociar ativos a um preço limitado, ou negociar ativos não suportados pela ExinCore no momento, OceanOne é a resposta.
 
-Você paga USDT para a ExinCore, a ExinCore transfere Bitcoin para você na hora com uma taxa bem baixa e um preço justo. Toda transação é anônima para o público mas ainda pode ser verificada no explorer da blockchain. Apenas você e ExinCore sabem os detalhes.
+## Solução Dois: Liste sua ordem na Ocean.One exchange
+[Ocean.one](https://github.com/mixinNetwork/ocean.one) é uma exchange descentralizada construída na Mixin Network, é quase a primeira vez que uma exchange descentralizada obtêm a mesma experiência de usuário do que uma centralizada.
 
-A ExinCore não sabe quem você é porque a ExinCore sabe apenas seu uuid de cliente.
+Você pode listar qualquer ativo na OceanOne. Pague o ativo que você quer vender para a conta OceanOne, escreva seu pedido no memo de pagamento, OceanOne listará sua ordem no mercado. Ela enviará o ativo para sua carteira após que sua ordem for correspondida.
 
-### Pré-requisito
-Você deve ter criado um bot baseado na Mixin Network. Crie um lendo [PHP Bitcoin tutorial](https://github.com/wenewzhang/mixin_labs-php-bot).
+* Não é necessário cadastro
+* Não é necessário depósito.
+* Sem processo de listagem.
 
-#### Instale os pacotes exigidos
-Como você sabe, nós apresentamos a você o mixin-sdk-php no [cápitulo 1](https://github.com/wenewzhang/mixin_labs-php-bot/blob/master/README.md), supondo que foi instalado antes, vamos instalar o **uuid, msgpack** aqui.
-```bash
-  composer require ramsey/uuid
-  composer require rybakit/msgpack
-```
+### Pré-requisito:
+Você deve ter criado um bot baseado na Mixin Network. Crie um lendo [PHP Bitcoin tutorial](https://github.com/wenewzhang/mixin_labs-php-bot/blob/master/README.md).
+
+#### Instale pacotes necessários
+[Capítulo 4](https://github.com/wenewzhang/mixin_labs-php-bot/blob/master/README4.md) apresenta [**mixin-sdk-php**](https://packagist.org/packages/exinone/mixin-sdk-php) para você, assumindo que foi instalado antes.
+
 #### Deposite USDT ou Bitcoin na sua conta Mixin Network e leia o saldo
-ExinCore pode cambiar entre Bitcoin, USDT, EOS, Eth etc. Aqui te mostra como cambiar entre USDT e Bitcoin,
-Verifique o saldo e endereço da carteira antes de fazer a ordem.
+A Ocean.one pode corresponder qualquer ordem. Aqui nós cambiamos entre USDT e Bitcoin, Cheque o saldo da carteira & endereço antes de você fazer a ordem.
 
-- Verifique o endereço e o saldo, lembre que é um endereço de carteira Bitcoin.
-- Deposite Bitcoin neste endereço de carteira Bitcoin.
-- Verifique o saldo de Bitcoin após 100 minutos mais tarde.
+- Cheque o endereço e saldo, ache seu endereço de carteira Bitcoin.
+- Deposite Bitcoin nesse endereço de carteira Bitcoin.
+- Cheque o saldo de Bitcoin após 100 minutos ou mais.
 
-**A propósito, o endereço Bitcoin & USDT são os mesmos.**
+**O endereço Omni USDT é o mesmo que o endereço Bitcoin**
 
 ```php
-if ($line == '2') {
-  if (($handle = fopen("new_users.csv", "r")) !== FALSE) {
-  while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
-    $mixinSdk_eachAccountInstance = new MixinSDK(GenerateConfigByCSV($data));
-    $asset_info = $mixinSdk_eachAccountInstance->Wallet()->readAsset(BTC_ASSET_ID);
-    print_r("Bitcoin wallet address is :".$asset_info["public_key"]."\n");
-    print_r("Bitcoin wallet balance is :".$asset_info["balance"]."\n");
-  }
-    fclose($handle);
-  } else print("Create user first\n");
-}
-if ($line == '3') {
-  if (($handle = fopen("new_users.csv", "r")) !== FALSE) {
-  while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
-    $mixinSdk_eachAccountInstance = new MixinSDK(GenerateConfigByCSV($data));
-    $asset_info = $mixinSdk_eachAccountInstance->Wallet()->readAsset(USDT_ASSET_ID);
-    print_r("USDT wallet address is :".$asset_info["public_key"]."\n");
-    print_r("USDT wallet balance is :".$asset_info["balance"]."\n");
-  }
-    fclose($handle);
-  } else print("Create user first\n");
-}
+  const BTC_ASSET_ID     = "c6d0c728-2624-429b-8e0d-d9d19b6592fa";
+  const EOS_ASSET_ID     = "6cfe566e-4aad-470b-8c9a-2fd35b49c68d";
+  const USDT_ASSET_ID    = "815b0b1a-2764-3736-8faa-42d694fa620a";
+
+  $mixinSdk_eachAccountInstance = new MixinSDK(GenerateConfigByCSV($data));
+  $asset_info = $mixinSdk_eachAccountInstance->Wallet()->readAsset(BTC_ASSET_ID);
+  print_r("Bitcoin wallet address is :".$asset_info["public_key"]."\n");
+  print_r("Bitcoin wallet balance is :".$asset_info["balance"]."\n");
 ```
-#### Leia o preço de mercado
+
+#### Leia o livro de ordens da Ocean.one
 Como verificar o preço da moeda? Você precisa entender qual é a moeda base. Se você quer comprar Bitcoin e vender USDT, o USDT é a moeda base. Se você quer comprar USDT e vender Bitcoin, o Bitcoin é a moeda base.
+
+
 ```php
-function getExchangeCoins($base_coin) :string {
+if ( $ocmd == '1') { getOceanOneMarketInfos(XIN_ASSET_ID,USDT_ASSET_ID);}
+function getOceanOneMarketInfos($targetCoin, $baseCoin)  {
   $client = new GuzzleHttp\Client();
-  $res = $client->request('GET', 'https://exinone.com/exincore/markets?base_asset='.$base_coin, [
+  $baseUrl = "https://events.ocean.one/markets/".$targetCoin."-".$baseCoin."/book";
+  $res = $client->request('GET', $baseUrl, [
       ]);
-  $result = "";
   if ($res->getStatusCode() == "200") {
     // echo $res->getStatusCode() . PHP_EOL;
     $resInfo = json_decode($res->getBody(), true);
-    echo "Asset ID | Asset Symbol | Price | Amount | Exchanges" . PHP_EOL;
-    $result = "Asset ID | Asset Symbol | Price | Amount | Exchanges" . PHP_EOL;
-    foreach ($resInfo["data"] as $key => $coinInfo) {
-      echo ($coinInfo["exchange_asset"] ." ".$coinInfo["exchange_asset_symbol"]. "/". $coinInfo["base_asset_symbol"] .
-            " ". $coinInfo["price"] ." ". $coinInfo["minimum_amount"] ."-". $coinInfo["maximum_amount"] . " ");
-      $result .= $coinInfo["exchange_asset_symbol"]. "/". $coinInfo["base_asset_symbol"] .
-                  " ". $coinInfo["price"] ." ". $coinInfo["minimum_amount"] ."-". $coinInfo["maximum_amount"] . " ";
-      foreach ($coinInfo["exchanges"] as $key => $exchange) {
-        echo $exchange . " ";
-        $result .= $exchange . " ";
-      }
-      echo PHP_EOL;
-      $result .= PHP_EOL;
+    echo "Side | Price | Amount | Funds" . PHP_EOL;
+    foreach ($resInfo["data"]["data"]["asks"] as $key => $exchange) {
+      echo $exchange["side"] . " " . $exchange["price"] . " " . $exchange["amount"] ." " . $exchange["funds"] . PHP_EOL;
+    }
+    foreach ($resInfo["data"]["data"]["bids"] as $key => $exchange) {
+      echo $exchange["side"] . " " . $exchange["price"] . " " . $exchange["amount"] ." " . $exchange["funds"] . PHP_EOL;
     }
   }
-  return $result;
 }
 ```
 
-#### Crie um memorando para preparar a ordem
-O capítulo dois: [Ecoar Bitcoin](https://github.com/wenewzhang/mixin_labs-php-bot/blob/master/README2.md) apresenta transferência de moedas. Mas você precisa deixar a ExinCore saber qual moeda você quer comprar. Apenas escreva seu ativo alvo no memorando.
-```php
-$memo = base64_encode(MessagePack::pack([
-                     'A' => Uuid::fromString($_targetAssetID)->getBytes(),
-                     ]));
-```
-#### Pague BTC para a gateway do API como o memorando gerado
-Transferir Bitcoin(BTC_ASSET_ID) para ExinCore(EXIN_BOT), coloque seu uuid do ativo alvo no memorando, de outra forma, ExinCore reembolsará a moeda imediatamente!
-```php
-const EXIN_BOT        = "61103d28-3ac2-44a2-ae34-bd956070dab1";
-const BTC_ASSET_ID    = "c6d0c728-2624-429b-8e0d-d9d19b6592fa";
-const EOS_ASSET_ID    = "6cfe566e-4aad-470b-8c9a-2fd35b49c68d";
-const USDT_ASSET_ID   = "815b0b1a-2764-3736-8faa-42d694fa620a";
-coinExchange(BTC_ASSET_ID,"0.0001",USDT_ASSET_ID);
+#### Crie um memo para preparar a ordem
+O capítulo dois: [Echo Bitcoin](https://github.com/wenewzhang/mixin_labs-php-bot/blob/master/README2.md) apresenta transferência de moedas. Mas você precisa deixar a Ocean.one saber qual moeda você deseja comprar.
+- **side** "B" ou "A", "B" para compra, "A" para Venda.
+- **asset** UUID do ativo que você quer comprar
+- **price** Se Side é "B", Price é AssetUUID; se Side é "A", Price é o ativo que transfere para a Ocean.one.
 
-//...........
-
-function coinExchange($_assetID,$_amount,$_targetAssetID) {
-  $mixinSdk = new MixinSDK(require './config.php');
-  // print_r();
+```php
+function GenerateOrderMemo($side, $asset, $price) :string {
   $memo = base64_encode(MessagePack::pack([
-                       'A' => Uuid::fromString($_targetAssetID)->getBytes(),
+                       'S' => $side,
+                       'A' => Uuid::fromString($asset)->getBytes(),
+                       'P' => $price,
+                       'T' => 'L',
                        ]));
-  $BotInfo = $mixinSdk->Wallet()->transfer($_assetID,EXIN_BOT,
-                                           $mixinSdk->getConfig()['default']['pin'],$_amount,$memo);
-  print_r($BotInfo);
+  return $memo;
 }
 ```
-A ExinCore deve transferir a moeda alvo para o seu bot, enquanto isso, coloque as informações de taxa, id da ordem, preço e etc. no memorando, descompacte os dados igual abaixo.
-- **readUserSnapshots** lê snapshots do usuário.
+
+#### Pague BTC para a OceanOne com o memo gerado
+Transfira Bitcoin(BTC_ASSET_ID) para a Ocean.one(OCEANONE_BOT), coloque seu ativo alvo uuid(USDT) no memo.
+
 ```php
-$limit        = 20;
-$offset       = '2019-03-10T01:58:25.362528Z';
-$snapInfo = $mixinSdk_BotInstance->Wallet()->readUserSnapshots($limit, $offset);
-// print_r($networkInfo2);
-foreach ($snapInfo as  $record) {
-  // echo $key . PHP_EOL;
-  // print_r($record);
-  if ($record['amount'] > 0 and $record['memo'] != '') {
-    echo "------------MEMO:-coin--exchange--------------" . PHP_EOL;
-    echo "memo: " . $record['memo'] . PHP_EOL;
-    // print_r($dtPay->memo);
-    echo "You Get Coins: ". $record['asset_id']. " " . $record['amount'] . PHP_EOL;
-    $memoUnpack = MessagePack::unpack(base64_decode($record['memo']));
-    $feeAssetID = Uuid::fromBytes($memoUnpack['FA'])->toString();
-    $OrderID    = Uuid::fromBytes($memoUnpack['O'])->toString();
-    if ($memoUnpack['C'] == 1000) {
-      echo "Successful Exchange:". PHP_EOL;
-      echo "Fee asset ID: " . $feeAssetID . " fee is :" . $memoUnpack['F'] . PHP_EOL;
-      echo "Order ID: " . $OrderID . " Price is :" . $memoUnpack['P'] . PHP_EOL;
-    } else print_r($memoUnpack);
-    echo "--------------memo-record end---------------" . PHP_EOL;
+const OCEANONE_BOT     = "aaff5bef-42fb-4c9f-90e0-29f69176b7d4";
+const USDT_ASSET_ID    = "815b0b1a-2764-3736-8faa-42d694fa620a";
+const XIN_ASSET_ID     = "c94ac88f-4671-3976-b60a-09064f1811e8";
+
+if ( $ocmd == 's1') {
+  $p = readline("Input the Price of XIN/USDT: ");
+  $a = readline("Input the Amount of XIN: ");
+  $tMemo = GenerateOrderMemo("A",USDT_ASSET_ID,$p);
+  echo $tMemo .  PHP_EOL;
+  $mixinSdk_WalletInstance = GenerateWalletSDKFromCSV();
+  $asset_info = $mixinSdk_WalletInstance->Wallet()->readAsset(XIN_ASSET_ID);
+  print_r($asset_info);
+  if ( (float) $asset_info["balance"] >= (float) $a ) {
+    $transInfos = $mixinSdk_WalletInstance->Wallet()->transfer(XIN_ASSET_ID,OCEANONE_BOT,
+                                                $mixinSdk_WalletInstance->getConfig()['default']['pin'],
+                                                $a,
+                                                $tMemo);
+    print_r($transInfos);
+    echo "The Order ID (trace_id) is: " . $transInfos["trace_id"] . PHP_EOL;
+  } else { echo "Not enough XIN!\n";}
+}
+```
+
+Se você quer comprar XIN, chame-o como abaixo:
+
+```php
+if ( $ocmd == 'b1') {
+  $p = readline("Input the Price of XIN/USDT: ");
+  $a = readline("Input the Amount of USDT: ");
+  $tMemo = GenerateOrderMemo("B",XIN_ASSET_ID,$p);
+  echo $tMemo .  PHP_EOL;
+  $mixinSdk_WalletInstance = GenerateWalletSDKFromCSV();
+  $asset_info = $mixinSdk_WalletInstance->Wallet()->readAsset(USDT_ASSET_ID);
+
+  print_r($asset_info);
+  if ( ((float) $asset_info["balance"] >= 1) && ( (float) $asset_info["balance"] >= (float) $a ) ) {
+    $transInfos = $mixinSdk_WalletInstance->Wallet()->transfer(USDT_ASSET_ID,OCEANONE_BOT,
+                                                $mixinSdk_WalletInstance->getConfig()['default']['pin'],
+                                                $a,
+                                                $tMemo);
+    print_r($transInfos);
+    echo "The Order ID (trace_id) is: " . $transInfos["trace_id"] . PHP_EOL;
+  } else { echo "Not enough USDT!\n";}
+}
+```
+
+Uma ordem bem sucedida tem a saída conforme abaixo:
+```bash
+Input the Price of XIN/USDT: 112
+Input the Amount of USDT: 1
+hKFToUKhQcQQyUrIj0ZxOXa2CgkGTxgR6KFQozExMqFUoUw=
+client id is:26b20aa5-40c0-3e00-9de0-666cfb6f2daa
+Array
+(
+    [type] => asset
+    [asset_id] => 815b0b1a-2764-3736-8faa-42d694fa620a
+    [chain_id] => c6d0c728-2624-429b-8e0d-d9d19b6592fa
+    [symbol] => USDT
+    [name] => Tether USD
+    [icon_url] => https://images.mixin.one/ndNBEpObYs7450U08oAOMnSEPzN66SL8Mh-f2pPWBDeWaKbXTPUIdrZph7yj8Z93Rl8uZ16m7Qjz-E-9JFKSsJ-F=s128
+    [balance] => 1
+    [public_key] => 17z1Rq3VsyvvXvGWiHT8YErjBoFgnhErB8
+    [account_name] =>
+    [account_tag] =>
+    [price_btc] => 0.00019038
+    [price_usd] => 1.00036293
+    [change_btc] => 0.013486479778200063
+    [change_usd] => 0.005376748815937048
+    [asset_key] => 815b0b1a-2764-3736-8faa-42d694fa620a
+    [confirmations] => 6
+    [capitalization] => 0
+)
+Array
+(
+    [type] => transfer
+    [snapshot_id] => f4b1f8d6-004a-4d2b-997d-4d0acf1096cd
+    [opponent_id] => aaff5bef-42fb-4c9f-90e0-29f69176b7d4
+    [asset_id] => 815b0b1a-2764-3736-8faa-42d694fa620a
+    [amount] => -1
+    [trace_id] => b12eed67-6cf4-481f-b25b-dd41f28e1984
+    [memo] => hKFToUKhQcQQyUrIj0ZxOXa2CgkGTxgR6KFQozExMqFUoUw=
+    [created_at] => 2019-04-30T01:17:02.206240549Z
+    [counter_user_id] => aaff5bef-42fb-4c9f-90e0-29f69176b7d4
+)
+The Order ID (trace_id) is: b12eed67-6cf4-481f-b25b-dd41f28e1984
+```
+## Cancelar a ordem
+Para cancelar uma ordem, apenas pague qualquer quantidade de qualquer ativo para a OceanOne, e escreva trace_id no memo. Ocean.one pega o trace_id como o id da ordem, por exemplo, **b12eed67-6cf4-481f-b25b-dd41f28e1984** é um id de ordem,
+Nós podemos usá-lo para cancelar a ordem.
+
+```php
+if ( $ocmd == 'c' ) {
+  $mixinSdk_WalletInstance = GenerateWalletSDKFromCSV();
+  $asset_info = $mixinSdk_WalletInstance->Wallet()->readAsset(CNB_ASSET_ID);
+  if ( ((float) $asset_info["balance"] == 0) ) {
+     echo "Please deposit some CNB to this Wallet!" . PHP_EOL;
+  } else {
+     $orderid = readline("Input the Order id ( trace_id ): ");
+     $cMemo =  base64_encode(MessagePack::pack([
+                           'O' => Uuid::fromString($orderid)->getBytes(),
+                           ]));
+     $transInfos = $mixinSdk_WalletInstance->Wallet()->transfer(CNB_ASSET_ID,OCEANONE_BOT,
+                                                 $mixinSdk_WalletInstance->getConfig()['default']['pin'],
+                                                 "0.00000001",
+                                                 $cMemo);
+     print_r($transInfos);
+  }
+}
+```
+#### Leia o saldo de Bitcoin
+Cheque o saldo da carteira
+```php
+if ($line == 'aw') {
+  $mixinSdk_eachAccountInstance = GenerateWalletSDKFromCSV();
+  $asset_info = $mixinSdk_eachAccountInstance->Wallet()->readAssets();
+  foreach ($asset_info as $key => $asset) {
+    echo  $asset["symbol"] . "   " . $asset["asset_id"] ."   ". $asset["balance"] .
+          "   ". $asset["public_key"].PHP_EOL;
   }
 }
 ```
 
-Se sua troca de moedas foi um sucesso, a saída do console mostrará o seguinte:
-```bash
-------------MEMO:-coin--exchange--------------
-memo: hqFDzQPooVCnMzg3Mi45N6FGqTAuMDAwNzc0NqJGQcQQgVsLGidkNzaPqkLWlPpiCqFUoUahT8QQIbfeL6p5RVOcEP0mLb+t+g==
-You Get Coins: 815b0b1a-2764-3736-8faa-42d694fa620a 0.3857508
-Successful Exchange:
-Fee asset ID: 815b0b1a-2764-3736-8faa-42d694fa620a fee is :0.0007746
-Order ID: 21b7de2f-aa79-4553-9c10-fd262dbfadfa Price is :3872.97
---------------memo-record end---------------
-```
+## Uso do código fonte
+Construa e execute-o
 
-#### Leia o saldo de Bitcoin
-Verifique o saldo da carteira.
-```php
-$mixinSdk = new MixinSDK(require './config.php');
-$asset_info = $mixinSdk->Wallet()->readAsset(USDT_ASSET_ID);
-print_r("USDT wallet balance is :".$asset_info["balance"]."\n");
-```
-## Uso do código de fonte
-Execute **php call_apis.php** para rodar isto.
+- **php bitcoin_wallet.php** run it.
 
-- 1: Criar usuário e atualizar PIN
-- 2: Ler o saldo e endereço de Bitcoin
-- 3: Ler o saldo e o endereço USDT
-- 4: Ler saldo EOS
-- 5: Ler endereço EOS
-- 6: Transferir Bitcoin do bot para um novo usuário
-- 7: Transferir Bitcoin de um novo usuário para Master
-- 8: Sacar Bitcoin do bot
-- 9: Sacar EOS do bot
-- qu: Ler o preço de mercado (USDT)
-- qb: Ler o preço de mercado(BTC)
-- b: Saldo do bot (USDT & BTC)
-- s: Leitura instantânea
-- tb: Transferir 0.0001 BTC comprar USDT
-- tu: Transferir $1 USDT comprar BTC
+Comandos de negociação com a OceanOne:
+
+- o: Ocean.One Exchange
 - q: Sair
 
-[Código fonte completo](https://github.com/wenewzhang/mixin_labs-php-bot/blob/master/call_apis.php)
+Faça sua escolha(eg: q para Sair!):
 
-## Solução dois: Listar sua ordem na exchange Ocean.One
+- 1:  Buscar ordens de XIN/USDT
+- s1: Vender XIN/USDT
+- b1: Comprar XIN/USDT
+- 2:  Buscar ordens ERC20(Benz)/USDT
+- s2: Vender Benz/USDT
+- b2: Comprar Benz/USDT
+- q:  Sair
+
+[Código fonte completo](https://github.com/wenewzhang/mixin_labs-php-bot/blob/master/bitcoin_wallet.php)
