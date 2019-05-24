@@ -1,18 +1,19 @@
-# 用PHP在去中心化交易所OceanOne上挂单买卖任意ERC20 token
-![](https://github.com/wenewzhang/mixin_labs-php-bot/raw/master/php-eth.jpg)
+# How to list any ERC20 token on decentralized market through PHP
+![](https://github.com/wenewzhang/mixin_labs-php-bot/blob/master/php-eth.jpg)
 
-在[上一课](https://github.com/wenewzhang/mixin_labs-php-bot/blob/master/README5.md)中，我们介绍了如何在OceanOne交易比特币。OceanOne支持交易任何Mixin Network上的token，包括所有的ERC20和EOS token，不需要任何手续和费用，直接挂单即可。下面介绍如何将将一个ERC20 token挂上OceanOne交易！在掌握了ERC20 token之后，就可以把任何token在Ocean上买卖。
+OceanOne is introduced in [last chapter](https://github.com/wenewzhang/mixin_labs-php-bot/blob/master/README5.md), you can trade Bitcoin. All kinds of crypto asset on Mixin Network can be listed on OceanOne.All ERC20 token and EOS token can be listed. Following example will show you how to list a ERC20 token. You can list other token after read the tutorial.
 
-此处我们用一个叫做Benz的[ERC20 token](https://etherscan.io/token/0xc409b5696c5f9612e194a582e14c8cd41ecdbc67)为例。这个token已经被充值进Mixin Network，你可以在[区块链浏览器](https://mixin.one/snapshots/2b9c216c-ef60-398d-a42a-eba1b298581d )看到这个token在Mixin Network内部的总数和交易
-### 预备知识:
-先将Benz币存入你的钱包，然后使用**getAssets** API读取它的UUID.
+There is a [ERC20 token](https://etherscan.io/token/0xc409b5696c5f9612e194a582e14c8cd41ecdbc67) called Benz. It is deposited into Mixin Network. You can search all transaction history from [Mixin Network browser](https://mixin.one/snapshots/2b9c216c-ef60-398d-a42a-eba1b298581d )
 
-### 取得该币的UUID
-调用 **getAssets** API 会返回json数据, 如:
+### Pre-request:
+Deposit some coin to your wallet, and then use **getAssets** API fetch the asset UUID which Mixin Network gave it.
 
-- **asset_id** 币的UUID.
-- **public_key** 该币的当前钱包的地址.
-- **symbol**  币的名称. 如: Benz.
+### Get the ERC-20 compliant coin UUID
+The **getAssets** API return json data, for example:
+
+- **asset_id** UUID of this coin
+- **public_key** The wallet address for this coin
+- **symbol**  Coin name, Eg: Benz.
 
 ```php
 if ($line == 'aw') {
@@ -24,7 +25,7 @@ if ($line == 'aw') {
   }
 }
 ```
-调用 **getAssets** API的完整输出如下:
+The detail information of **getAssets** is output like below:
 ```bash
 Make your choose:aw
 run...
@@ -35,14 +36,13 @@ CNB   965e5c6e-434c-3fa9-b780-c50f43cd955c   4.72599997   0x9A4F6c67444cd6558905
 BTC   c6d0c728-2624-429b-8e0d-d9d19b6592fa   0   17z1Rq3VsyvvXvGWiHT8YErjBoFgnhErB8
 XIN   c94ac88f-4671-3976-b60a-09064f1811e8   0.01   0x9A4F6c67444cd6558905ef5B04a4c429b9538A9d
 ```
-### 限价挂单
-- **挂限价买单**  低于或者等于市场价的单.
-- **挂限价卖单**  高于或者是等于市场价的单.
+### Make the limit order
+- **Limit Order to Buy**  at or below the market.
+- **Limit Order to Sell**  at or above the market.
 
-OceanOne支持三种基类价格: USDT, XIN, BTC, 即: Benz/USDT, Benz/XIN, Benz/BTC, 这儿示范Benz/USDT.
+OceanOne support three base coin: USDT, XIN, BTC, that mean you can sell or buy it between USDT, XIN, BTC, so, you have there order: Benz/USDT, Benz/XIN, Benz/BTC, here show you how to make the sell order with USDT.
 
-### 限价挂卖单.
-新币挂单后,需要等一分钟左右，等OceanOne来初始化新币的相关数据.
+### Make the limit order to sell.
 
 ```php
 if ( $ocmd == 's1') {
@@ -64,9 +64,8 @@ if ( $ocmd == 's1') {
 }
 ```
 
-### 限价挂买单.
-新币挂单后,需要等一分钟左右，等OceanOne来初始化新币的相关数据.
-
+### Make the limit order to buy.
+After the order commit, wait 1 minute to let the OceanOne exchange initialize it.
 ```php
 if ( $ocmd == 'b1') {
   $p = readline("Input the Price of XIN/USDT: ");
@@ -87,8 +86,8 @@ if ( $ocmd == 'b1') {
   } else { echo "Not enough USDT!\n";}
 }
 ```
-### 读取币的价格列表
-读取币的价格列表，来确认挂单是否成功!
+### Read orders book from Ocean.one
+Now, check the orders-book.
 
 ```php
     if ( $ocmd == '2') { getOceanOneMarketInfos(ERC20_BENZ,USDT_ASSET_ID);}
@@ -110,7 +109,7 @@ if ( $ocmd == 'b1') {
       }
     }
 ```
-### ERC20相关的操作指令
+### Command of make orders
 
 Commands list of this source code:
 
@@ -125,4 +124,4 @@ Make your choose(eg: q for Exit!):
 - c: Cancel the order
 - q: Exit
 
-[完整的代码](https://github.com/wenewzhang/mixin_labs-php-bot/blob/master/bitcoin_wallet.php)
+[Full source code](https://github.com/wenewzhang/mixin_labs-php-bot/blob/master/bitcoin_wallet.php)
