@@ -1,32 +1,31 @@
-# 通过 PHP 买卖Bitcoin
+# How to trade bitcoin through PHP
 ![](https://github.com/wenewzhang/mixin_labs-php-bot/raw/master/Bitcoin_php.jpg)
-上一章介绍了[Exincore](https://github.com/wenewzhang/mixin_labs-php-bot/blob/master/README4-zhchs.md)，你可以1秒完成资产的市价买卖。如果你想限定价格买卖，或者买卖一些exincore不支持的资产，你需要OceanOne。
 
-## 方案二: 挂单Ocean.One交易所
-[Ocean.one](https://github.com/mixinNetwork/ocean.one)是基于Mixin Network的去中心化交易所，它性能一流。
-你可以在OceanOne上交易任何资产，只需要将你的币转给OceanOne, 将交易信息写在交易的memo里，OceanOne会在市场里列出你的交易需求，
-交易成功后，会将目标币转入到你的MixinNetwork帐上，它有三大特点与优势：
-- 不需要在OceanOne注册
-- 不需要存币到交易所
-- 支持所有Mixin Network上能够转账的资产，所有的ERC20 EOS代币。
+Exincore is introduced in [last chapter](https://github.com/wenewzhang/mixin_labs-php-bot/blob/master/README4.md), you can exchange many crypto asset at market price and receive your asset in 1 seconds. If you want to trade asset at limited price, or trade asset is not supported by ExinCore now, OceanOne is the answer.
 
-### 预备知识:
-你先需要创建一个机器人, 方法在 [教程一](https://github.com/wenewzhang/mixin_labs-php-bot/blob/master/README-zhchs.md).
+## Solution Two: List your order on Ocean.One exchange
+[Ocean.one](https://github.com/mixinNetwork/ocean.one) is a decentralized exchange built on Mixin Network, it's almost the first time that a decentralized exchange gain the same user experience as a centralized one.
 
-#### 安装依赖包
-正如教程一里我们介绍过的， 我们需要依赖 [**mixin-sdk-php**](https://packagist.org/packages/exinone/mixin-sdk-php), 你应该已经先安装过它了.
+You can list any asset on OceanOne. Pay the asset you want to sell to OceanOne account, write your request in payment memo, OceanOne will list your order to market. It send asset to your wallet after your order is matched.
 
-#### 安装依赖的库
-[第四课](https://github.com/wenewzhang/mixin_labs-php-bot/blob/master/README4-zhchs.md), 在上一课中已经安装好了.
+* No sign up required
+* No deposit required
+* No listing process.
 
-#### 充币到 Mixin Network, 并读出它的余额.
-此处演示用 USDT购买BTC 或者 用BTC购买USDT。交易前，先检查一下钱包地址。
-完整的步骤如下:
-- 检查比特币或USDT的余额，钱包地址。并记下钱包地址。
-- 从第三方交易所或者你的冷钱包中，将币充到上述钱包地址。
-- 再检查一下币的余额，看到帐与否。(比特币的到帐时间是5个区块的高度，约100分钟)。
+### Pre-request:
+You should  have created a bot based on Mixin Network. Create one by reading [PHP Bitcoin tutorial](https://github.com/wenewzhang/mixin_labs-php-bot/blob/master/README.md).
 
-比特币与USDT的充值地址是一样的。
+#### Install required packages
+[Chapter 4](https://github.com/wenewzhang/mixin_labs-php-bot/blob/master/README4.md) introduce [**mixin-sdk-php**](https://packagist.org/packages/exinone/mixin-sdk-php) to you, assume it has installed before.
+
+#### Deposit USDT or Bitcoin into your Mixin Network account and read balance
+The Ocean.one can match any order. Here we exchange between USDT and Bitcoin, Check the wallet's balance & address before you make order.
+
+- Check the address & balance, find it's Bitcoin wallet address.
+- Deposit Bitcoin to this Bitcoin wallet address.
+- Check Bitcoin balance after 100 minutes later.
+
+**Omni USDT address is same as Bitcoin address**
 
 ```php
   const BTC_ASSET_ID     = "c6d0c728-2624-429b-8e0d-d9d19b6592fa";
@@ -39,8 +38,9 @@
   print_r("Bitcoin wallet balance is :".$asset_info["balance"]."\n");
 ```
 
-#### 取得Ocean.one的市场价格信息
-如何来查询Ocean.one市场的价格信息呢？你要先了解你交易的基础币是什么，如果你想买比特币，卖出USDT,那么基础货币就是USDT;如果你想买USDT,卖出比特币，那么基础货币就是比特币.
+#### Read orders book from Ocean.one
+How to check the coin's price? You need understand what is the base coin. If you want buy Bitcoin and sell USDT, the USDT is the base coin. If you want buy USDT and sell Bitcoin, the Bitcoin is the base coin.
+
 
 ```php
 if ( $ocmd == '1') { getOceanOneMarketInfos(XIN_ASSET_ID,USDT_ASSET_ID);}
@@ -63,11 +63,11 @@ function getOceanOneMarketInfos($targetCoin, $baseCoin)  {
 }
 ```
 
-#### 交易前，创建一个Memo!
-在第二章里,[基于Mixin Network的 PHP 比特币开发教程: 机器人接受比特币并立即退还用户](https://github.com/wenewzhang/mixin_labs-php-bot/blob/master/README2-zhchs.md), 我们学习过转帐，这儿我们介绍如何告诉Ocean.one，我们给它转帐的目的是什么，信息全部放在memo里.
-- **side** 方向,"B" 或者 "A", "B"是购买, "A"是出售.
-- **asset** 目标虚拟资产的UUID.
-- **price** 价格，如果操作方向是"B", 价格就是AssetUUID的价格; 如果操作方向是"B", 价格就是转给Ocean.one币的价格.
+#### Create a memo to prepare order
+The chapter two: [Echo Bitcoin](https://github.com/wenewzhang/mixin_labs-php-bot/blob/master/README2.md) introduce transfer coins. But you need to let Ocean.one know which coin you want to buy.
+- **side** "B" or "A", "B" for buy, "A" for Sell.
+- **asset** UUID of the asset you want to buy
+- **price** If Side is "B", Price is AssetUUID; if Side is "A", Price is the asset which transfer to Ocean.one.
 
 ```php
 function GenerateOrderMemo($side, $asset, $price) :string {
@@ -81,8 +81,8 @@ function GenerateOrderMemo($side, $asset, $price) :string {
 }
 ```
 
-#### 出售XIN的例子
-转打算出售的XIN给Ocean.one(OCEANONE_BOT),将你打算换回来的目标虚拟资产的UUID放入memo.
+#### Pay BTC to OceanOne with generated memo
+Transfer Bitcoin(BTC_ASSET_ID) to Ocean.one(OCEANONE_BOT), put you target asset uuid(USDT) in the memo.
 
 ```php
 const OCEANONE_BOT     = "aaff5bef-42fb-4c9f-90e0-29f69176b7d4";
@@ -107,7 +107,8 @@ if ( $ocmd == 's1') {
   } else { echo "Not enough XIN!\n";}
 }
 ```
-如果你是打算买XIN,操作如下:
+
+If you want buy XIN, call it like below:
 
 ```php
 if ( $ocmd == 'b1') {
@@ -130,7 +131,7 @@ if ( $ocmd == 'b1') {
 }
 ```
 
-一个成功的挂单如下：
+A success order output like below:
 ```bash
 Input the Price of XIN/USDT: 112
 Input the Amount of USDT: 1
@@ -170,8 +171,9 @@ Array
 )
 The Order ID (trace_id) is: b12eed67-6cf4-481f-b25b-dd41f28e1984
 ```
-#### 取消挂单
-Ocean.one将trace_id当做订单，比如上面的例子， **b12eed67-6cf4-481f-b25b-dd41f28e1984** 就是订单号，我们用他来取消订单。
+## Cancel the Order
+To cancel order, just pay any amount of any asset to OceanOne, and write trace_id into memo. Ocean.one take the trace_id as the order id, for example, **b12eed67-6cf4-481f-b25b-dd41f28e1984** is a order id,
+We can use it to cancel the order.
 
 ```php
 if ( $ocmd == 'c' ) {
@@ -192,7 +194,7 @@ if ( $ocmd == 'c' ) {
   }
 }
 ```
-#### 通过读取资产余额，来确认到帐情况
+#### Read Bitcoin balance
 Check the wallet's balance.
 ```php
 if ($line == 'aw') {
@@ -205,12 +207,12 @@ if ($line == 'aw') {
 }
 ```
 
-## 源代码执行
-运行就可以开始交易了.
+## Source code usage
+Build it and then run it.
 
-- **php bitcoin_wallet.php**  运行项目
+- **php bitcoin_wallet.php** run it.
 
-本代码执行时的命令列表:
+Commands of trade with OceanOne:
 
 - o: Ocean.One Exchange
 - q: Exit
@@ -225,4 +227,4 @@ Make your choose(eg: q for Exit!):
 - b2: Buy Benz/USDT
 - q:  Exit
 
-[完整代码](https://github.com/wenewzhang/mixin_labs-php-bot/blob/master/bitcoin_wallet.php)
+[Full source code](https://github.com/wenewzhang/mixin_labs-php-bot/blob/master/bitcoin_wallet.php)
